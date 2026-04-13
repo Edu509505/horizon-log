@@ -51,7 +51,7 @@ export function CadastroMaisInformacoes() {
   const createAccount = useMutation({
     mutationKey: ["createaccount"],
     mutationFn: async () => {
-      const userResponse = await fetch(`http://localhost:8080/createaccount`, {
+      const userResponse = await fetch(`http://localhost:3000/users`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -72,7 +72,7 @@ export function CadastroMaisInformacoes() {
         idUser: userCriado.id,
       };
 
-      const empresaResponse = await fetch("http://localhost:8080/corporation", {
+      const empresaResponse = await fetch("http://localhost:3000/empresa", {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify(empresaData),

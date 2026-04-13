@@ -13,11 +13,14 @@ import { Button } from "../../ui/button";
 import { InputNumeroCelular } from "../../inputAutoCurrent/inputNumeroCelular";
 import { Inputcpf } from "../../inputAutoCurrent/InputCpf";
 import { InputData } from "../../inputAutoCurrent/InputDataNascimento";
-import { formCreateAccount } from "../../../../states/createAccount";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { InputSenha } from "#/components/inputAutoCurrent/inputSenha";
+import { useMutation } from "@tanstack/react-query";
+import { Spinner } from "#/components/ui/spinner";
+import { AlertDialog, AlertDialogTrigger } from "#/components/ui/alert-dialog";
 
 const createAccountSchema = z.object({
-  nome: z.string().min(5, "Digite seu nome"),
+  name: z.string().min(5, "Digite seu nome"),
   email: z.email(),
   cpf: z.string().refine((val) => isCPF(val), { error: "CPF inválido" }),
   numero: z
@@ -29,45 +32,51 @@ const createAccountSchema = z.object({
     .refine((val) => 2026 - parseInt(val.split("/")[2]) > 22, {
       error: "A idade mínima é de 22 anos",
     }),
+  password: z.string().min(6, "Sua senha precisa ter no mínimo 6 digitos"),
 });
 
 export function Cadastro() {
   const form = useForm<z.infer<typeof createAccountSchema>>({
     resolver: zodResolver(createAccountSchema),
     defaultValues: {
-      nome: "",
+      name: "",
       email: "",
       cpf: "",
       nascimento: "",
       numero: "",
+      password: "",
     },
   });
 
-  const formStore = formCreateAccount();
+  const createAccount = useMutation({
+    mutationKey: ["createaccount"],
+    mutationFn: async (data: z.infer<typeof createAccountSchema>) => {
+      const response = await fetch(`http://localhost:3333/users`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
 
-  const navigate = useNavigate();
-  const nextPage = async () => {
-    await navigate({
-      to: "/create-account/credentials",
-      search: { tab: "overview" },
-      replace: true,
-    });
-  };
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorText}`);
+      }
+
+      return response.json();
+    },
+  });
   async function onsubmit(data: z.infer<typeof createAccountSchema>) {
-    formStore.nome = data.nome;
-    formStore.email = data.email;
-    formStore.cpf = data.cpf;
-    formStore.nascimento = data.nascimento;
-    formStore.numero = data.numero;
-    console.log("O ESTADO TÁ AQUI", formStore);
-    await nextPage();
+    createAccount.mutateAsync(data);
   }
 
   return (
     <form id="form-rhf-demo" onSubmit={form.handleSubmit(onsubmit)}>
       <FieldGroup>
         <Controller
-          name="nome"
+          name="name"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
@@ -142,6 +151,22 @@ export function Cadastro() {
             </Field>
           )}
         />
+
+        <Controller
+          name="password"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="password">Senha</FieldLabel>
+
+              {/* Aqui a mágica acontece de forma isolada */}
+              <InputSenha value={field.value} onChange={field.onChange} />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
         <div className="flex gap-2">
           <Link to="/login">
             <Button
@@ -152,9 +177,53 @@ export function Cadastro() {
               Cancelar
             </Button>
           </Link>
-          <Button type="submit" className="cursor-pointer" form="form-rhf-demo">
-            Continuar
-          </Button>
+          <AlertDialog open={createAccount.isSuccess || createAccount.isError}>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                form="form-rhf-demo"
+                disabled={createAccount.isPending}
+              >
+                {createAccount.isPending ? (
+                  <>
+                    <Spinner /> Cadastrar
+                  </>
+                ) : (
+                  <>Cadastrar</>
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            {/* {createAccount.isError ? (
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    your account from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction>Continue</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            ) : (
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    your account from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction>Continue</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            )} */}
+          </AlertDialog>
         </div>
       </FieldGroup>
     </form>
