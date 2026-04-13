@@ -18,6 +18,7 @@ import { InputSenha } from "#/components/inputAutoCurrent/inputSenha";
 import { useMutation } from "@tanstack/react-query";
 import { Spinner } from "#/components/ui/spinner";
 import { AlertDialog, AlertDialogTrigger } from "#/components/ui/alert-dialog";
+import { format } from "date-fns";
 
 const createAccountSchema = z.object({
   name: z.string().min(5, "Digite seu nome"),
@@ -29,11 +30,19 @@ const createAccountSchema = z.object({
   nascimento: z
     .string()
     .refine((val) => isDate(val), { error: "Insira uma data válida" })
-    .refine((val) => 2026 - parseInt(val.split("/")[2]) > 22, {
-      error: "A idade mínima é de 22 anos",
-    }),
+    .refine(
+      (val) =>
+        parseInt(new Date().toString().split(" ")[3]) -
+          parseInt(val.split("/")[2]) >=
+        22,
+      {
+        error: "A idade mínima é de 22 anos",
+      },
+    ),
   password: z.string().min(6, "Sua senha precisa ter no mínimo 6 digitos"),
 });
+
+console.log();
 
 export function Cadastro() {
   const form = useForm<z.infer<typeof createAccountSchema>>({
