@@ -6,7 +6,7 @@ import {
 } from "#/components/ui/card";
 import { createFileRoute } from "@tanstack/react-router";
 import Logo from "@/assets/logo.svg";
-import { CadastroMaisInformacoes } from "#/components/forms/createAccount/formCreateAccountCredentials";
+import { CadastroMaisInformacoes } from "#/routes/create-account/formCreateAccountCredentials";
 
 export const Route = createFileRoute("/create-account/credentials")({
   component: RouteComponent,

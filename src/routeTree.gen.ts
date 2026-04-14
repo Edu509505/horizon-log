@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as CreateAccountIndexRouteImport } from './routes/create-account/index'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as CreateAccountFormCreateAccountCredentialsRouteImport } from './routes/create-account/formCreateAccountCredentials'
 import { Route as CreateAccountCredentialsRouteImport } from './routes/create-account/credentials'
 
 const LoginRoute = LoginRouteImport.update({
@@ -34,6 +35,12 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const CreateAccountFormCreateAccountCredentialsRoute =
+  CreateAccountFormCreateAccountCredentialsRouteImport.update({
+    id: '/create-account/formCreateAccountCredentials',
+    path: '/create-account/formCreateAccountCredentials',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CreateAccountCredentialsRoute =
   CreateAccountCredentialsRouteImport.update({
     id: '/create-account/credentials',
@@ -45,11 +52,13 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
+  '/create-account/formCreateAccountCredentials': typeof CreateAccountFormCreateAccountCredentialsRoute
   '/create-account/': typeof CreateAccountIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
+  '/create-account/formCreateAccountCredentials': typeof CreateAccountFormCreateAccountCredentialsRoute
   '/': typeof AuthenticatedIndexRoute
   '/create-account': typeof CreateAccountIndexRoute
 }
@@ -58,19 +67,31 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
+  '/create-account/formCreateAccountCredentials': typeof CreateAccountFormCreateAccountCredentialsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/create-account/': typeof CreateAccountIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/create-account/credentials' | '/create-account/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/create-account/credentials'
+    | '/create-account/formCreateAccountCredentials'
+    | '/create-account/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/create-account/credentials' | '/' | '/create-account'
+  to:
+    | '/login'
+    | '/create-account/credentials'
+    | '/create-account/formCreateAccountCredentials'
+    | '/'
+    | '/create-account'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
     | '/create-account/credentials'
+    | '/create-account/formCreateAccountCredentials'
     | '/_authenticated/'
     | '/create-account/'
   fileRoutesById: FileRoutesById
@@ -79,6 +100,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   CreateAccountCredentialsRoute: typeof CreateAccountCredentialsRoute
+  CreateAccountFormCreateAccountCredentialsRoute: typeof CreateAccountFormCreateAccountCredentialsRoute
   CreateAccountIndexRoute: typeof CreateAccountIndexRoute
 }
 
@@ -112,6 +134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/create-account/formCreateAccountCredentials': {
+      id: '/create-account/formCreateAccountCredentials'
+      path: '/create-account/formCreateAccountCredentials'
+      fullPath: '/create-account/formCreateAccountCredentials'
+      preLoaderRoute: typeof CreateAccountFormCreateAccountCredentialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/create-account/credentials': {
       id: '/create-account/credentials'
       path: '/create-account/credentials'
@@ -138,6 +167,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   CreateAccountCredentialsRoute: CreateAccountCredentialsRoute,
+  CreateAccountFormCreateAccountCredentialsRoute:
+    CreateAccountFormCreateAccountCredentialsRoute,
   CreateAccountIndexRoute: CreateAccountIndexRoute,
 }
 export const routeTree = rootRouteImport

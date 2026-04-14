@@ -29,6 +29,9 @@ import {
   AlertDialogTrigger,
 } from "#/components/ui/alert-dialog";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useAuth } from "states/userAuth";
+import { api } from "#/lib/api";
 
 const createAccountSchema = z.object({
   name: z.string().min(5, "Digite seu nome"),
@@ -88,14 +91,37 @@ export function Cadastro() {
     },
   });
 
+  const setAuth = useAuth((state) => state.setAuth);
+
   async function onsubmit(data: z.infer<typeof createAccountSchema>) {
     try {
       await createAccount.mutateAsync(data);
+
+      const loginResponse = await api.post("/auth/login", {
+        email: data.email,
+        password: data.password,
+      });
+
+      const { acces_token, user } = loginResponse.data;
+
+      setAuth(acces_token, user);
+
+      toast.success(`Seja muito bem-vindo ${data.name}`);
+
       setIsOpen(true);
     } catch (error) {
       setIsOpen(true);
     }
   }
+
+  const navigate = useNavigate();
+  const nextPage = async () => {
+    await navigate({
+      to: "/create-account/credentials",
+      search: { tab: "overview" },
+      replace: true,
+    });
+  };
 
   return (
     <form id="form-rhf-demo" onSubmit={form.handleSubmit(onsubmit)}>
@@ -230,11 +256,9 @@ export function Cadastro() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <Link to="/login">
-                    <AlertDialogCancel onClick={() => setIsOpen(false)}>
-                      Rerornar
-                    </AlertDialogCancel>
-                  </Link>
+                  <AlertDialogCancel onClick={() => setIsOpen(false)}>
+                    Rerornar
+                  </AlertDialogCancel>
                 </AlertDialogFooter>
               </AlertDialogContent>
             ) : (
@@ -246,7 +270,9 @@ export function Cadastro() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogAction onClick={() => setIsOpen(false)}>
+                  <AlertDialogAction
+                    onClick={() => (setIsOpen(false), nextPage())}
+                  >
                     Continuar
                   </AlertDialogAction>
                 </AlertDialogFooter>

@@ -8,93 +8,105 @@ import {
 } from "@/components/ui/field";
 import { Controller, useForm } from "react-hook-form";
 import { isCNPJ } from "brazilian-values";
-import { Button } from "../../ui/button";
-import {
-  informacaoEmpresa,
-  formCreateAccount,
-} from "../../../../states/createAccount";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Button } from "../../components/ui/button";
+// import { formCreateAccount } from "../../../../states/createAccount";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { Input } from "#/components/ui/input";
 import { InputCnpj } from "#/components/inputAutoCurrent/InputCnpj";
 import { useMutation } from "@tanstack/react-query";
+import { useAuth } from "states/userAuth";
+import { toast } from "sonner";
 
-const createAccountSchema = z.object({
+const createEmpresaSchema = z.object({
+  user_id: z.string(),
   cnpj: z.string().refine((val) => isCNPJ(val), { error: "CNPJ inválido" }),
-  razaoSocial: z.string().min(5, "Nome inválido"),
-  nomeFantasia: z.string().min(1, "Deve ter pelo menos um caractere"),
+  razaosocial: z.string().min(5, "Nome inválido"),
+  nomefantasia: z.string().min(1, "Deve ter pelo menos um caractere"),
+});
+
+export const Route = createFileRoute(
+  "/create-account/formCreateAccountCredentials",
+)({
+  component: CadastroMaisInformacoes,
+  beforeLoad: async ({ location }) => {
+    const storage = localStorage.getItem("horizon-auth");
+
+    try {
+      const authData = storage ? JSON.parse(storage) : null;
+      const token = authData?.state?.token;
+
+      // 3. Se não tiver token ou for undefined/null, tchau!
+      if (!token || token === "undefined") {
+        throw redirect({
+          to: "/login",
+          search: { redirect: location.href },
+        });
+      }
+    } catch (e) {
+      throw redirect({ to: "/login" });
+    }
+  },
 });
 
 export function CadastroMaisInformacoes() {
-  const formEmpresa = informacaoEmpresa();
+  const user = useAuth();
 
-  const formStorePersonalInformation = formCreateAccount();
-
-  const form = useForm<z.infer<typeof createAccountSchema>>({
-    resolver: zodResolver(createAccountSchema),
+  const form = useForm<z.infer<typeof createEmpresaSchema>>({
+    resolver: zodResolver(createEmpresaSchema),
     defaultValues: {
+      user_id: user.user.id,
       cnpj: "",
-      razaoSocial: "",
-      nomeFantasia: "",
+      razaosocial: "",
+      nomefantasia: "",
     },
   });
 
-  console.log("Estado aqui", formEmpresa);
   const navigate = useNavigate();
   const nextPage = async () => {
     await navigate({
-      to: "/create-account/credentials",
+      to: "/",
       search: { tab: "overview" },
-      replace: true, // Replaces current history entry instead of pushing
+      replace: true,
     });
   };
 
+  // const [isOpen, setIsOpen] = useState<boolean | undefined>(false);
+
+  const token = useAuth();
+
   const createAccount = useMutation({
     mutationKey: ["createaccount"],
-    mutationFn: async () => {
-      const userResponse = await fetch(`http://localhost:3000/users`, {
+    mutationFn: async (data: z.infer<typeof createEmpresaSchema>) => {
+      const response = await fetch(`http://localhost:3333/empresa`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
+          Authorization: `Bearer ${token.token}`,
         },
-        body: JSON.stringify(formStorePersonalInformation),
+        body: JSON.stringify(data),
         credentials: "include",
       });
 
-      if (!userResponse.ok) {
-        const errorText = await userResponse.text();
-        throw new Error(`Erro ${userResponse.status}: ${errorText}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorText}`);
       }
 
-      const userCriado = await userResponse.json();
-
-      const empresaData = {
-        ...formStorePersonalInformation,
-        idUser: userCriado.id,
-      };
-
-      const empresaResponse = await fetch("http://localhost:3000/empresa", {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(empresaData),
-      });
-
-      if (!empresaResponse.ok) throw new Error("Erro Empresa");
-
-      return empresaResponse.json();
-    },
-    onSuccess: () => {
-      alert("Tudo certo");
+      return response.json();
     },
   });
 
-  async function onsubmit(data: z.infer<typeof createAccountSchema>) {
-    formEmpresa.cnpj = data.cnpj;
-    formEmpresa.razaoSocial = data.razaoSocial;
-    formEmpresa.nomeFantasia = data.nomeFantasia;
+  async function onsubmit(data: z.infer<typeof createEmpresaSchema>) {
+    try {
+      await createAccount.mutateAsync(data);
 
-    await createAccount.mutateAsync();
+      toast.success(`Corporação criada com Sucesso!!!`);
 
-    await nextPage();
+      await nextPage();
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Falha ao criar empresa";
+      toast.error(message);
+    }
   }
 
   return (
@@ -107,7 +119,7 @@ export function CadastroMaisInformacoes() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="contato">CPF</FieldLabel>
+                <FieldLabel htmlFor="contato">Cnpj</FieldLabel>
                 <InputCnpj value={field.value} onChange={field.onChange} />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -117,7 +129,7 @@ export function CadastroMaisInformacoes() {
           />
         </div>
         <Controller
-          name="razaoSocial"
+          name="razaosocial"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
@@ -136,7 +148,7 @@ export function CadastroMaisInformacoes() {
           )}
         />
         <Controller
-          name="nomeFantasia"
+          name="nomefantasia"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
@@ -154,37 +166,8 @@ export function CadastroMaisInformacoes() {
             </Field>
           )}
         />
-        <div className="flex gap-2 flex-wrap">
-          <h1>
-            <strong>Nome:</strong> {formStorePersonalInformation.nome}
-          </h1>{" "}
-          <h1>
-            <strong>CPF:</strong> {formStorePersonalInformation.cpf}
-          </h1>{" "}
-          <h1>
-            <strong>E-Mail:</strong> {formStorePersonalInformation.email}
-          </h1>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <h1>
-            <strong>Nascimento:</strong>{" "}
-            {formStorePersonalInformation.nascimento}
-          </h1>
-          <h1>
-            <strong>Contato:</strong> {formStorePersonalInformation.numero}
-          </h1>
-        </div>
 
         <div className="flex gap-2">
-          <Link to="/login">
-            <Button
-              variant="secondary"
-              className="cursor-pointer"
-              form="form-rhf-demo"
-            >
-              Voltar
-            </Button>
-          </Link>
           <Button type="submit" className="cursor-pointer" form="form-rhf-demo">
             Continuar
           </Button>

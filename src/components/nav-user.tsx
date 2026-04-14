@@ -37,6 +37,8 @@ export function NavUser({
 
   const userLog = useAuth();
 
+  console.log(userLog.user.id);
+
   const avatarTextImage =
     user.name.split(" ")[0].split("")[0] + user.name.split(" ")[1].split("")[0];
 
