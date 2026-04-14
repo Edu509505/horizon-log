@@ -13,16 +13,26 @@ import { Button } from "../../ui/button";
 import { InputNumeroCelular } from "../../inputAutoCurrent/inputNumeroCelular";
 import { Inputcpf } from "../../inputAutoCurrent/InputCpf";
 import { InputData } from "../../inputAutoCurrent/InputDataNascimento";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { InputSenha } from "#/components/inputAutoCurrent/inputSenha";
 import { useMutation } from "@tanstack/react-query";
 import { Spinner } from "#/components/ui/spinner";
-import { AlertDialog, AlertDialogTrigger } from "#/components/ui/alert-dialog";
-import { format } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "#/components/ui/alert-dialog";
+import { useState } from "react";
 
 const createAccountSchema = z.object({
   name: z.string().min(5, "Digite seu nome"),
-  email: z.email(),
+  email: z.email({ error: "Insira um E-mail válido" }),
   cpf: z.string().refine((val) => isCPF(val), { error: "CPF inválido" }),
   numero: z
     .string()
@@ -42,8 +52,6 @@ const createAccountSchema = z.object({
   password: z.string().min(6, "Sua senha precisa ter no mínimo 6 digitos"),
 });
 
-console.log();
-
 export function Cadastro() {
   const form = useForm<z.infer<typeof createAccountSchema>>({
     resolver: zodResolver(createAccountSchema),
@@ -56,6 +64,8 @@ export function Cadastro() {
       password: "",
     },
   });
+
+  const [isOpen, setIsOpen] = useState<boolean | undefined>(false);
 
   const createAccount = useMutation({
     mutationKey: ["createaccount"],
@@ -77,8 +87,14 @@ export function Cadastro() {
       return response.json();
     },
   });
+
   async function onsubmit(data: z.infer<typeof createAccountSchema>) {
-    createAccount.mutateAsync(data);
+    try {
+      await createAccount.mutateAsync(data);
+      setIsOpen(true);
+    } catch (error) {
+      setIsOpen(true);
+    }
   }
 
   return (
@@ -186,7 +202,7 @@ export function Cadastro() {
               Cancelar
             </Button>
           </Link>
-          <AlertDialog open={createAccount.isSuccess || createAccount.isError}>
+          <AlertDialog open={isOpen}>
             <AlertDialogTrigger asChild>
               <Button
                 type="submit"
@@ -203,35 +219,39 @@ export function Cadastro() {
                 )}
               </Button>
             </AlertDialogTrigger>
-            {/* {createAccount.isError ? (
+            {createAccount.isError ? (
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    Não foi possivel completar essa ação
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your account from our servers.
+                    A acção não pode ser concluída, tente novamente mais tarde
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction>Continue</AlertDialogAction>
+                  <Link to="/login">
+                    <AlertDialogCancel onClick={() => setIsOpen(false)}>
+                      Rerornar
+                    </AlertDialogCancel>
+                  </Link>
                 </AlertDialogFooter>
               </AlertDialogContent>
             ) : (
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogTitle>Cadastro realizado</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your account from our servers.
+                    Seu cadastro foi realizado e inserido com sucesso
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction>Continue</AlertDialogAction>
+                  <AlertDialogAction onClick={() => setIsOpen(false)}>
+                    Continuar
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
-            )} */}
+            )}
           </AlertDialog>
         </div>
       </FieldGroup>

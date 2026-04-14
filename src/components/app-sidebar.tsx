@@ -19,6 +19,7 @@ import {
   FolderIcon,
   UsersIcon,
 } from "lucide-react";
+import { useAuth } from "states/userAuth";
 
 const data = {
   user: {
@@ -56,6 +57,9 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const usuario = useAuth();
+
+  console.log(usuario.user);
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -77,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={usuario.user} />
       </SidebarFooter>
     </Sidebar>
   );

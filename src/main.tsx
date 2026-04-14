@@ -1,11 +1,17 @@
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { useAuth } from "states/userAuth";
+
+const auth = useAuth.getState();
 
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   scrollRestoration: true,
+  context: {
+    auth,
+  },
 });
 
 declare module "@tanstack/react-router" {
