@@ -91,6 +91,24 @@ export function Cadastro() {
     },
   });
 
+  const user_id = useAuth();
+
+  const enviarOTP = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`http://localhost:3333/verify`, {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({
+          user_id: user_id.user.id,
+          type: "email_verification",
+        }),
+      });
+      if (!response.ok) throw new Error("Erro ao reenviar");
+      return response.json();
+    },
+    onSuccess: () => toast.success("Novo código enviado para seu e-mail!"),
+  });
+
   const setAuth = useAuth((state) => state.setAuth);
 
   async function onsubmit(data: z.infer<typeof createAccountSchema>) {
@@ -108,6 +126,8 @@ export function Cadastro() {
 
       toast.success(`Seja muito bem-vindo ${data.name}`);
 
+      await enviarOTP.mutateAsync();
+
       setIsOpen(true);
     } catch (error) {
       setIsOpen(true);
@@ -117,7 +137,7 @@ export function Cadastro() {
   const navigate = useNavigate();
   const nextPage = async () => {
     await navigate({
-      to: "/create-account/credentials",
+      to: "/create-account/confirmed-email",
       search: { tab: "overview" },
       replace: true,
     });

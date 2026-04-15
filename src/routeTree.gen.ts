@@ -15,6 +15,7 @@ import { Route as CreateAccountIndexRouteImport } from './routes/create-account/
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as CreateAccountFormCreateAccountCredentialsRouteImport } from './routes/create-account/formCreateAccountCredentials'
 import { Route as CreateAccountCredentialsRouteImport } from './routes/create-account/credentials'
+import { Route as CreateAccountConfirmedEmailRouteImport } from './routes/create-account/confirmed-email'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -47,16 +48,24 @@ const CreateAccountCredentialsRoute =
     path: '/create-account/credentials',
     getParentRoute: () => rootRouteImport,
   } as any)
+const CreateAccountConfirmedEmailRoute =
+  CreateAccountConfirmedEmailRouteImport.update({
+    id: '/create-account/confirmed-email',
+    path: '/create-account/confirmed-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/create-account/confirmed-email': typeof CreateAccountConfirmedEmailRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
   '/create-account/formCreateAccountCredentials': typeof CreateAccountFormCreateAccountCredentialsRoute
   '/create-account/': typeof CreateAccountIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/create-account/confirmed-email': typeof CreateAccountConfirmedEmailRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
   '/create-account/formCreateAccountCredentials': typeof CreateAccountFormCreateAccountCredentialsRoute
   '/': typeof AuthenticatedIndexRoute
@@ -66,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/create-account/confirmed-email': typeof CreateAccountConfirmedEmailRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
   '/create-account/formCreateAccountCredentials': typeof CreateAccountFormCreateAccountCredentialsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -76,12 +86,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/create-account/confirmed-email'
     | '/create-account/credentials'
     | '/create-account/formCreateAccountCredentials'
     | '/create-account/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/create-account/confirmed-email'
     | '/create-account/credentials'
     | '/create-account/formCreateAccountCredentials'
     | '/'
@@ -90,6 +102,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/create-account/confirmed-email'
     | '/create-account/credentials'
     | '/create-account/formCreateAccountCredentials'
     | '/_authenticated/'
@@ -99,6 +112,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  CreateAccountConfirmedEmailRoute: typeof CreateAccountConfirmedEmailRoute
   CreateAccountCredentialsRoute: typeof CreateAccountCredentialsRoute
   CreateAccountFormCreateAccountCredentialsRoute: typeof CreateAccountFormCreateAccountCredentialsRoute
   CreateAccountIndexRoute: typeof CreateAccountIndexRoute
@@ -148,6 +162,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateAccountCredentialsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/create-account/confirmed-email': {
+      id: '/create-account/confirmed-email'
+      path: '/create-account/confirmed-email'
+      fullPath: '/create-account/confirmed-email'
+      preLoaderRoute: typeof CreateAccountConfirmedEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -166,6 +187,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  CreateAccountConfirmedEmailRoute: CreateAccountConfirmedEmailRoute,
   CreateAccountCredentialsRoute: CreateAccountCredentialsRoute,
   CreateAccountFormCreateAccountCredentialsRoute:
     CreateAccountFormCreateAccountCredentialsRoute,
