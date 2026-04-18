@@ -31,8 +31,10 @@ export function NavUser({
     name: string;
     email: string;
     avatar: string;
+    is_active: boolean;
   };
 }) {
+  console.log("User", user);
   const { isMobile } = useSidebar();
 
   const userLog = useAuth();
@@ -90,13 +92,15 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CircleUserRoundIcon />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
+              <Link to="/account">
+                <DropdownMenuItem>
+                  <CircleUserRoundIcon />
+                  Conta
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem disabled={user.is_active}>
                 <CreditCardIcon />
-                Billing
+                Minha Empresa
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <BellIcon />

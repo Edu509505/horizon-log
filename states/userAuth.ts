@@ -8,6 +8,23 @@ interface AuthState {
   logout: () => void;
 }
 
+interface AuthPreRegister {
+  preRegistration: any | null;
+  setPreRegister: (preRegistration: any) => void;
+  clearPreRegister: () => void;
+}
+
+export const usePreRegister = create<AuthPreRegister>()(
+  persist(
+    (set) => ({
+      preRegistration: null,
+      setPreRegister: (preRegistration) => set({ preRegistration }),
+      clearPreRegister: () => set({ preRegistration: null }),
+    }),
+    { name: "horizonPreRegistration" },
+  ),
+);
+
 export const useAuth = create<AuthState>()(
   persist(
     (set) => ({

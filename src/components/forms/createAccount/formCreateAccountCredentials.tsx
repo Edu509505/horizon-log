@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/field";
 import { Controller, useForm } from "react-hook-form";
 import { isCNPJ } from "brazilian-values";
-import { Button } from "../../components/ui/button";
+import { Button } from "../../ui/button";
 // import { formCreateAccount } from "../../../../states/createAccount";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { Input } from "#/components/ui/input";
@@ -24,37 +24,13 @@ const createEmpresaSchema = z.object({
   nomefantasia: z.string().min(1, "Deve ter pelo menos um caractere"),
 });
 
-export const Route = createFileRoute(
-  "/create-account/formCreateAccountCredentials",
-)({
-  component: CadastroMaisInformacoes,
-  beforeLoad: async ({ location }) => {
-    const storage = localStorage.getItem("horizon-auth");
-
-    try {
-      const authData = storage ? JSON.parse(storage) : null;
-      const token = authData?.state?.token;
-
-      // 3. Se não tiver token ou for undefined/null, tchau!
-      if (!token || token === "undefined") {
-        throw redirect({
-          to: "/login",
-          search: { redirect: location.href },
-        });
-      }
-    } catch (e) {
-      throw redirect({ to: "/login" });
-    }
-  },
-});
-
 export function CadastroMaisInformacoes() {
   const user = useAuth();
 
   const form = useForm<z.infer<typeof createEmpresaSchema>>({
     resolver: zodResolver(createEmpresaSchema),
     defaultValues: {
-      user_id: user.user.id,
+      user_id: user.user?.id,
       cnpj: "",
       razaosocial: "",
       nomefantasia: "",
@@ -74,6 +50,8 @@ export function CadastroMaisInformacoes() {
 
   const token = useAuth();
 
+  console.log(token);
+
   const createAccount = useMutation({
     mutationKey: ["createaccount"],
     mutationFn: async (data: z.infer<typeof createEmpresaSchema>) => {
@@ -84,7 +62,7 @@ export function CadastroMaisInformacoes() {
           Authorization: `Bearer ${token.token}`,
         },
         body: JSON.stringify(data),
-        credentials: "include",
+        // credentials: "include",
       });
 
       if (!response.ok) {

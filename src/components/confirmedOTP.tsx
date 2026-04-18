@@ -20,9 +20,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
+import { usePreRegister } from "states/userAuth";
 
 interface inputOTPFormProps {
   user_id: string;
+  pre_registration_id: string;
   type: string;
 }
 
@@ -30,7 +32,11 @@ const schemaOtp = z.object({
   inputOtp: z.string().length(6, "O código deve conter 6 digitos"),
 });
 
-export function InputOTPForm({ user_id, type }: inputOTPFormProps) {
+export function InputOTPForm({
+  user_id,
+  pre_registration_id,
+  type,
+}: inputOTPFormProps) {
   const form = useForm<z.infer<typeof schemaOtp>>({
     resolver: zodResolver(schemaOtp),
     defaultValues: {
@@ -38,17 +44,18 @@ export function InputOTPForm({ user_id, type }: inputOTPFormProps) {
     },
   });
 
+  console.log("pre registro recebido: ", pre_registration_id);
   const reenviarOTP = useMutation({
     mutationFn: async () => {
       const response = await fetch(`http://localhost:3333/verify`, {
         method: "POST",
         headers: { "Content-type": "application/json" },
-        body: JSON.stringify({ user_id, type }),
+        body: JSON.stringify({ user_id, pre_registration_id, type }),
       });
       if (!response.ok) throw new Error("Erro ao reenviar");
       return response.json();
     },
-    onSuccess: () => toast.success("Novo código enviado para seu e-mail!"),
+    onSuccess: () => toast.success("Código enviado para seu e-mail!"),
   });
 
   const enviarConfirmacao = useMutation({
@@ -56,7 +63,11 @@ export function InputOTPForm({ user_id, type }: inputOTPFormProps) {
       const response = await fetch(`http://localhost:3333/verify/check`, {
         method: "POST",
         headers: { "Content-type": "application/json" },
-        body: JSON.stringify({ user_id: user_id, code: inputOtp }),
+        body: JSON.stringify({
+          code: inputOtp,
+          user_id: user_id,
+          pre_registration_id: pre_registration_id,
+        }),
         credentials: "include",
       });
       if (!response.ok) throw new Error("Código inválido ou expirado");
@@ -77,23 +88,24 @@ export function InputOTPForm({ user_id, type }: inputOTPFormProps) {
   const navigate = useNavigate();
   const nextPage = async () => {
     await navigate({
-      to: "/create-account/credentials",
+      to: "/create-account/formAccount",
       search: { tab: "overview" },
       replace: true,
     });
   };
+
+  const preRegister = usePreRegister();
 
   return (
     <Card className="mx-auto max-w-md">
       <CardHeader>
         <CardTitle>Verifique seu acesso</CardTitle>
         <CardDescription>
-          Insira o código enviado para seu e-mail
+          Insira o código enviado para {preRegister?.preRegistration.email}
         </CardDescription>
       </CardHeader>
 
       <CardContent>
-        {/* Agora o FORM envolve o conteúdo e o footer para o submit funcionar */}
         <form
           id="otp-form"
           onSubmit={form.handleSubmit(onsubmit)}
@@ -102,7 +114,7 @@ export function InputOTPForm({ user_id, type }: inputOTPFormProps) {
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium">Código de verificação</span>
             <Button
-              type="button" // IMPORTANTE: type button para não dar submit sem querer
+              type="button"
               variant="outline"
               size="sm"
               onClick={() => reenviarOTP.mutate()}

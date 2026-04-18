@@ -1,9 +1,27 @@
 import { Card, CardContent } from "#/components/ui/card";
-import { createFileRoute } from "@tanstack/react-router";
-import { CadastroMaisInformacoes } from "#/routes/create-account/formCreateAccountCredentials";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { CadastroMaisInformacoes } from "#/components/forms/createAccount/formCreateAccountCredentials";
 
 export const Route = createFileRoute("/create-account/credentials")({
   component: RouteComponent,
+  beforeLoad: async ({ location }) => {
+    const storage = localStorage.getItem("horizon-auth");
+
+    try {
+      const authData = storage ? JSON.parse(storage) : null;
+      const token = authData?.state?.token;
+
+      // 3. Se não tiver token ou for undefined/null, tchau!
+      if (!token || token === "undefined") {
+        throw redirect({
+          to: "/login",
+          search: { redirect: location.href },
+        });
+      }
+    } catch (e) {
+      throw redirect({ to: "/login" });
+    }
+  },
 });
 
 function RouteComponent() {
@@ -14,7 +32,6 @@ function RouteComponent() {
           <CadastroMaisInformacoes />
         </CardContent>
       </Card>
-      <h1 className="font-bold text-2xl text-foreground"></h1>
     </div>
   );
 }

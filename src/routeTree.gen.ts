@@ -13,9 +13,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as CreateAccountIndexRouteImport } from './routes/create-account/index'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as CreateAccountFormCreateAccountCredentialsRouteImport } from './routes/create-account/formCreateAccountCredentials'
+import { Route as CreateAccountFormAccountRouteImport } from './routes/create-account/formAccount'
 import { Route as CreateAccountCredentialsRouteImport } from './routes/create-account/credentials'
 import { Route as CreateAccountConfirmedEmailRouteImport } from './routes/create-account/confirmed-email'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -36,10 +37,10 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const CreateAccountFormCreateAccountCredentialsRoute =
-  CreateAccountFormCreateAccountCredentialsRouteImport.update({
-    id: '/create-account/formCreateAccountCredentials',
-    path: '/create-account/formCreateAccountCredentials',
+const CreateAccountFormAccountRoute =
+  CreateAccountFormAccountRouteImport.update({
+    id: '/create-account/formAccount',
+    path: '/create-account/formAccount',
     getParentRoute: () => rootRouteImport,
   } as any)
 const CreateAccountCredentialsRoute =
@@ -54,20 +55,27 @@ const CreateAccountConfirmedEmailRoute =
     path: '/create-account/confirmed-email',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/create-account/confirmed-email': typeof CreateAccountConfirmedEmailRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
-  '/create-account/formCreateAccountCredentials': typeof CreateAccountFormCreateAccountCredentialsRoute
+  '/create-account/formAccount': typeof CreateAccountFormAccountRoute
   '/create-account/': typeof CreateAccountIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/create-account/confirmed-email': typeof CreateAccountConfirmedEmailRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
-  '/create-account/formCreateAccountCredentials': typeof CreateAccountFormCreateAccountCredentialsRoute
+  '/create-account/formAccount': typeof CreateAccountFormAccountRoute
   '/': typeof AuthenticatedIndexRoute
   '/create-account': typeof CreateAccountIndexRoute
 }
@@ -75,9 +83,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/create-account/confirmed-email': typeof CreateAccountConfirmedEmailRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
-  '/create-account/formCreateAccountCredentials': typeof CreateAccountFormCreateAccountCredentialsRoute
+  '/create-account/formAccount': typeof CreateAccountFormAccountRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/create-account/': typeof CreateAccountIndexRoute
 }
@@ -86,25 +95,28 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/account'
     | '/create-account/confirmed-email'
     | '/create-account/credentials'
-    | '/create-account/formCreateAccountCredentials'
+    | '/create-account/formAccount'
     | '/create-account/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/account'
     | '/create-account/confirmed-email'
     | '/create-account/credentials'
-    | '/create-account/formCreateAccountCredentials'
+    | '/create-account/formAccount'
     | '/'
     | '/create-account'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/account'
     | '/create-account/confirmed-email'
     | '/create-account/credentials'
-    | '/create-account/formCreateAccountCredentials'
+    | '/create-account/formAccount'
     | '/_authenticated/'
     | '/create-account/'
   fileRoutesById: FileRoutesById
@@ -114,7 +126,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   CreateAccountConfirmedEmailRoute: typeof CreateAccountConfirmedEmailRoute
   CreateAccountCredentialsRoute: typeof CreateAccountCredentialsRoute
-  CreateAccountFormCreateAccountCredentialsRoute: typeof CreateAccountFormCreateAccountCredentialsRoute
+  CreateAccountFormAccountRoute: typeof CreateAccountFormAccountRoute
   CreateAccountIndexRoute: typeof CreateAccountIndexRoute
 }
 
@@ -148,11 +160,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/create-account/formCreateAccountCredentials': {
-      id: '/create-account/formCreateAccountCredentials'
-      path: '/create-account/formCreateAccountCredentials'
-      fullPath: '/create-account/formCreateAccountCredentials'
-      preLoaderRoute: typeof CreateAccountFormCreateAccountCredentialsRouteImport
+    '/create-account/formAccount': {
+      id: '/create-account/formAccount'
+      path: '/create-account/formAccount'
+      fullPath: '/create-account/formAccount'
+      preLoaderRoute: typeof CreateAccountFormAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/create-account/credentials': {
@@ -169,14 +181,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateAccountConfirmedEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
@@ -189,8 +210,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   CreateAccountConfirmedEmailRoute: CreateAccountConfirmedEmailRoute,
   CreateAccountCredentialsRoute: CreateAccountCredentialsRoute,
-  CreateAccountFormCreateAccountCredentialsRoute:
-    CreateAccountFormCreateAccountCredentialsRoute,
+  CreateAccountFormAccountRoute: CreateAccountFormAccountRoute,
   CreateAccountIndexRoute: CreateAccountIndexRoute,
 }
 export const routeTree = rootRouteImport

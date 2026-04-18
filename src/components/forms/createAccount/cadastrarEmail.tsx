@@ -7,14 +7,9 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Controller, useForm } from "react-hook-form";
-import { isCPF, isDate, isPhone } from "brazilian-values";
 import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
-import { InputNumeroCelular } from "../../inputAutoCurrent/inputNumeroCelular";
-import { Inputcpf } from "../../inputAutoCurrent/InputCpf";
-import { InputData } from "../../inputAutoCurrent/InputDataNascimento";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { InputSenha } from "#/components/inputAutoCurrent/inputSenha";
 import { useMutation } from "@tanstack/react-query";
 import { Spinner } from "#/components/ui/spinner";
 import {
@@ -31,51 +26,25 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth, usePreRegister } from "states/userAuth";
-import { api } from "#/lib/api";
 
 const createAccountSchema = z.object({
-  name: z.string().min(5, "Digite seu nome"),
   email: z.email({ error: "Insira um E-mail válido" }),
-  cpf: z.string().refine((val) => isCPF(val), { error: "CPF inválido" }),
-  numero: z
-    .string()
-    .refine((val) => isPhone(val), { error: "Insira um número válido" }),
-  nascimento: z
-    .string()
-    .refine((val) => isDate(val), { error: "Insira uma data válida" })
-    .refine(
-      (val) =>
-        parseInt(new Date().toString().split(" ")[3]) -
-          parseInt(val.split("/")[2]) >=
-        22,
-      {
-        error: "A idade mínima é de 22 anos",
-      },
-    ),
-  password: z.string().min(6, "Sua senha precisa ter no mínimo 6 digitos"),
 });
 
-export function Cadastro() {
-  const preRegister = usePreRegister();
-
+export function PreCadastro() {
   const form = useForm<z.infer<typeof createAccountSchema>>({
     resolver: zodResolver(createAccountSchema),
     defaultValues: {
-      name: "",
-      email: preRegister.preRegistration?.email,
-      cpf: "",
-      nascimento: "",
-      numero: "",
-      password: "",
+      email: "",
     },
   });
 
   const [isOpen, setIsOpen] = useState<boolean | undefined>(false);
 
   const createAccount = useMutation({
-    mutationKey: ["createaccount"],
+    mutationKey: ["preregitro"],
     mutationFn: async (data: z.infer<typeof createAccountSchema>) => {
-      const response = await fetch(`http://localhost:3333/users`, {
+      const response = await fetch(`http://localhost:3333/pre_registration`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -93,22 +62,32 @@ export function Cadastro() {
     },
   });
 
-  const setAuth = useAuth((state) => state.setAuth);
+  const enviarOTP = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`http://localhost:3333/verify`, {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({
+          pre_registration_id: id,
+          type: "email_verification",
+        }),
+      });
+      if (!response.ok) throw new Error("Erro ao reenviar");
+      return response.json();
+    },
+  });
+
+  const setPreRegister = usePreRegister((state) => state.setPreRegister);
 
   async function onsubmit(data: z.infer<typeof createAccountSchema>) {
     try {
-      await createAccount.mutateAsync(data);
+      const responseData = await createAccount.mutateAsync(data);
 
-      const loginResponse = await api.post("/auth/login", {
-        email: data.email,
-        password: data.password,
-      });
+      setPreRegister(responseData);
 
-      const { acces_token, user } = loginResponse.data;
+      toast.success(`Código enviado para ${data.email}`);
 
-      setAuth(acces_token, user);
-
-      toast.success(`Seja muito bem-vindo ${data.name}`);
+      await enviarOTP.mutateAsync(responseData.id);
 
       setIsOpen(true);
     } catch (error) {
@@ -119,84 +98,32 @@ export function Cadastro() {
   const navigate = useNavigate();
   const nextPage = async () => {
     await navigate({
-      to: "/create-account/credentials",
+      to: "/create-account/confirmed-email",
       search: { tab: "overview" },
       replace: true,
     });
   };
 
   return (
-    <form id="form-rhf-demo" onSubmit={form.handleSubmit(onsubmit)}>
+    <form
+      className="flex flex-col h-full justify-center"
+      id="form-rhf-demo"
+      onSubmit={form.handleSubmit(onsubmit)}
+    >
       <FieldGroup>
         <Controller
-          name="name"
+          name="email"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="form-rhf-demo-title">Nome</FieldLabel>
+              <FieldLabel htmlFor="form-rhf-demo-title">E-Mail</FieldLabel>
               <Input
                 {...field}
                 id="form-rhf-demo-title"
                 aria-invalid={fieldState.invalid}
-                placeholder="Digite seu nome"
+                placeholder="seuemail@exemplo.com"
                 autoComplete="off"
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-        <Controller
-          name="cpf"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="contato">CPF</FieldLabel>
-              <Inputcpf value={field.value} onChange={field.onChange} />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-        <Controller
-          name="nascimento"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="contato">Data de Nascimento</FieldLabel>
-
-              {/* Conectamos o componente customizado aqui */}
-              <InputData value={field.value} onChange={field.onChange} />
-
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-        <Controller
-          name="numero"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="contato">Contato</FieldLabel>
-
-              {/* Conectamos o componente customizado aqui */}
-              <InputNumeroCelular
-                value={field.value}
-                onChange={field.onChange}
-              />
-
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-        <Controller
-          name="password"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="password">Senha</FieldLabel>
-
-              {/* Aqui a mágica acontece de forma isolada */}
-              <InputSenha value={field.value} onChange={field.onChange} />
-
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -247,9 +174,9 @@ export function Cadastro() {
             ) : (
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Cadastro realizado</AlertDialogTitle>
+                  <AlertDialogTitle>Pré Cadastro realizado</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Seu cadastro foi realizado e inserido com sucesso
+                    Seu pré cadastro foi realizado e inserido com sucesso
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

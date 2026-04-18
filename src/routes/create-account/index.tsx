@@ -7,6 +7,7 @@ import {
 } from "#/components/ui/card";
 import { createFileRoute } from "@tanstack/react-router";
 import Logo from "@/assets/logo.svg";
+import { PreCadastro } from "#/components/forms/createAccount/cadastrarEmail";
 
 export const Route = createFileRoute("/create-account/")({
   component: RouteComponent,
@@ -28,7 +29,7 @@ function RouteComponent() {
           </div>
         </CardHeader>
         <CardContent className="w-1/2">
-          <Cadastro />
+          <PreCadastro />
         </CardContent>
       </Card>
     </div>
