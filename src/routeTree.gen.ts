@@ -16,6 +16,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as CreateAccountFormAccountRouteImport } from './routes/create-account/formAccount'
 import { Route as CreateAccountCredentialsRouteImport } from './routes/create-account/credentials'
 import { Route as CreateAccountConfirmedEmailRouteImport } from './routes/create-account/confirmed-email'
+import { Route as AuthenticatedOrdemDeTransporteRouteImport } from './routes/_authenticated/ordemDeTransporte'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 
 const LoginRoute = LoginRouteImport.update({
@@ -55,6 +56,12 @@ const CreateAccountConfirmedEmailRoute =
     path: '/create-account/confirmed-email',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedOrdemDeTransporteRoute =
+  AuthenticatedOrdemDeTransporteRouteImport.update({
+    id: '/ordemDeTransporte',
+    path: '/ordemDeTransporte',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/ordemDeTransporte': typeof AuthenticatedOrdemDeTransporteRoute
   '/create-account/confirmed-email': typeof CreateAccountConfirmedEmailRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
   '/create-account/formAccount': typeof CreateAccountFormAccountRoute
@@ -73,6 +81,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/ordemDeTransporte': typeof AuthenticatedOrdemDeTransporteRoute
   '/create-account/confirmed-email': typeof CreateAccountConfirmedEmailRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
   '/create-account/formAccount': typeof CreateAccountFormAccountRoute
@@ -84,6 +93,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authenticated/ordemDeTransporte': typeof AuthenticatedOrdemDeTransporteRoute
   '/create-account/confirmed-email': typeof CreateAccountConfirmedEmailRoute
   '/create-account/credentials': typeof CreateAccountCredentialsRoute
   '/create-account/formAccount': typeof CreateAccountFormAccountRoute
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/account'
+    | '/ordemDeTransporte'
     | '/create-account/confirmed-email'
     | '/create-account/credentials'
     | '/create-account/formAccount'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/account'
+    | '/ordemDeTransporte'
     | '/create-account/confirmed-email'
     | '/create-account/credentials'
     | '/create-account/formAccount'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/_authenticated/account'
+    | '/_authenticated/ordemDeTransporte'
     | '/create-account/confirmed-email'
     | '/create-account/credentials'
     | '/create-account/formAccount'
@@ -181,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateAccountConfirmedEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/ordemDeTransporte': {
+      id: '/_authenticated/ordemDeTransporte'
+      path: '/ordemDeTransporte'
+      fullPath: '/ordemDeTransporte'
+      preLoaderRoute: typeof AuthenticatedOrdemDeTransporteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/account': {
       id: '/_authenticated/account'
       path: '/account'
@@ -193,11 +213,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedOrdemDeTransporteRoute: typeof AuthenticatedOrdemDeTransporteRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedOrdemDeTransporteRoute: AuthenticatedOrdemDeTransporteRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 

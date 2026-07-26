@@ -14,10 +14,10 @@ import {
 } from "#/components/ui/sidebar";
 import {
   LayoutDashboardIcon,
-  ListIcon,
   ChartBarIcon,
   FolderIcon,
   UsersIcon,
+  Truck,
 } from "lucide-react";
 import { useAuth } from "states/userAuth";
 
@@ -30,17 +30,17 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/",
       icon: <LayoutDashboardIcon />,
     },
     {
-      title: "Lifecycle",
-      url: "#",
-      icon: <ListIcon />,
+      title: "Ordem de Transporte",
+      url: "/ordemDeTransporte",
+      icon: <Truck />,
     },
     {
       title: "Analytics",
-      url: "#",
+      url: "/oi",
       icon: <ChartBarIcon />,
     },
     {
@@ -49,7 +49,7 @@ const data = {
       icon: <FolderIcon />,
     },
     {
-      title: "Team",
+      title: "Equipe",
       url: "#",
       icon: <UsersIcon />,
     },
@@ -58,8 +58,6 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const usuario = useAuth();
-
-  console.log(usuario);
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -69,7 +67,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="#">
+              <a href="/">
                 <img src={Logo} className="size-5!" />
                 <span className="text-base font-semibold">Horizon Log</span>
               </a>

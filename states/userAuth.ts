@@ -1,9 +1,21 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  cpf: string;
+  nascimento: string;
+  numero: string;
+  avatar: string;
+  is_active: boolean;
+  empresas: []
+}
+
 interface AuthState {
   token: string | null;
-  user: any | null;
+  user: User | null;
   setAuth: (token: string, user: any) => void;
   logout: () => void;
 }

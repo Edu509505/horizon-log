@@ -52,7 +52,7 @@ export function LoginForm({
       navigate({ to: "/" });
     } catch (error: any) {
       const message = error.response?.data?.message || "Falha no login.";
-      toast.error(message);
+      toast.error(<p className="text-destructive">{message}</p>);
     }
   };
 
