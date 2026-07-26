@@ -1,24 +1,24 @@
-import { 
-  Card, 
-  CardHeader, 
-  CardContent, 
-  CardFooter 
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { 
-  ArrowRight, 
-  Clock, 
-  FileText, 
-  MapPin, 
-  Package, 
-  Truck, 
+import {
+  ArrowRight,
+  Clock,
+  FileText,
+  MapPin,
+  Package,
+  Truck,
   User,
   ChevronRight
 } from "lucide-react";
+import { VisualizarOrdemDeTransporte } from "../dialog/visualizarOrdemDeTransporte";
 
 interface CardOtProps {
   ordemDeTransporte: string;
@@ -47,7 +47,7 @@ export function CardOrdemTransporte({
   partida,
   destino,
 }: CardOtProps) {
-  
+
   // Função de status usando cores acessíveis tanto em Light quanto em Dark mode
   const getStatusBadgeVariant = (status: string) => {
     const s = status.toLowerCase();
@@ -71,7 +71,7 @@ export function CardOrdemTransporte({
 
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-all duration-200 border-border bg-card text-card-foreground">
-      
+
       {/* CABEÇALHO */}
       <CardHeader className="flex flex-row items-center justify-between pb-3 space-y-0">
         <div className="flex items-center gap-2.5">
@@ -88,7 +88,7 @@ export function CardOrdemTransporte({
       </CardHeader>
 
       <CardContent className="flex flex-col gap-4 pt-1">
-        
+
         {/* CARGA E DOCUMENTOS */}
         <div className="flex flex-col gap-1.5 text-sm">
           <div className="flex items-center gap-2 text-foreground">
@@ -124,7 +124,7 @@ export function CardOrdemTransporte({
               {partida}
             </span>
           </div>
-          
+
           <div className="flex-1 flex items-center justify-center relative px-2">
             <div className="h-[2px] w-full bg-border" />
             <ArrowRight className="size-4 text-muted-foreground absolute bg-card px-0.5" />
@@ -148,10 +148,7 @@ export function CardOrdemTransporte({
           <Clock className="size-3.5" />
           <span>Atualizado há 15 min</span>
         </div>
-        <Button variant="ghost" size="sm" className="h-8 text-xs font-medium text-primary hover:text-primary hover:bg-primary/10">
-          Detalhes
-          <ChevronRight className="size-4 ml-1" />
-        </Button>
+        <VisualizarOrdemDeTransporte caminhao={caminhao} container={container} destino={destino} emissao={emissao} motorista={motorista} notaFiscal={notaFiscal} numerocontainer={numerocontainer} ordemDeTransporte={ordemDeTransporte} partida={partida} placa={placa} status={status} />
       </CardFooter>
 
     </Card>
