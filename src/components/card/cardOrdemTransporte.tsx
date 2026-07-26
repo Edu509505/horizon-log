@@ -15,8 +15,7 @@ import {
   MapPin,
   Package,
   Truck,
-  User,
-  ChevronRight
+  User
 } from "lucide-react";
 import { VisualizarOrdemDeTransporte } from "../dialog/visualizarOrdemDeTransporte";
 

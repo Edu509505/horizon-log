@@ -1,4 +1,3 @@
-import React from "react";
 import {
     Truck,
     User,
@@ -6,9 +5,7 @@ import {
     MapPin,
     Calendar,
     Box,
-    ChevronRight,
-    ShieldCheck,
-    Building2,
+    ChevronRight
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
