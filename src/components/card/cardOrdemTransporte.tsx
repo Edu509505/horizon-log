@@ -2,7 +2,7 @@ import {
   Card,
   CardHeader,
   CardContent,
-  CardFooter
+  CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -15,11 +15,13 @@ import {
   MapPin,
   Package,
   Truck,
-  User
+  User,
+  UserCircle,
 } from "lucide-react";
 import { VisualizarOrdemDeTransporte } from "../dialog/visualizarOrdemDeTransporte";
 
 interface CardOtProps {
+  responsavel: string;
   ordemDeTransporte: string;
   status: string;
   emissao: string;
@@ -34,6 +36,7 @@ interface CardOtProps {
 }
 
 export function CardOrdemTransporte({
+  responsavel,
   ordemDeTransporte,
   status,
   emissao,
@@ -46,7 +49,6 @@ export function CardOrdemTransporte({
   partida,
   destino,
 }: CardOtProps) {
-
   // Função de status usando cores acessíveis tanto em Light quanto em Dark mode
   const getStatusBadgeVariant = (status: string) => {
     const s = status.toLowerCase();
@@ -65,31 +67,44 @@ export function CardOrdemTransporte({
     return "bg-secondary text-secondary-foreground";
   };
 
-  const dataFormatada = format(new Date(emissao.split(" ")[0]), "dd/MMM", { locale: ptBR });
-  const horaFormatada = emissao.split(" ")[1]?.split(".")[0] || "";
+  const dataFormatada = format(new Date(emissao.split(" ")[0]), "dd, MMM/yy", {
+    locale: ptBR,
+  });
+  const horaFormatada = emissao.split(" ")[1]?.split(".")[0].slice(0, 5) || "";
 
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-all duration-200 border-border bg-card text-card-foreground">
-
       {/* CABEÇALHO */}
       <CardHeader className="flex flex-row items-center justify-between pb-3 space-y-0">
-        <div className="flex items-center gap-2.5">
-          <span className="font-bold text-lg tracking-tight text-foreground">
-            #{ordemDeTransporte}
-          </span>
-          <Badge variant="outline" className={`font-medium border ${getStatusBadgeVariant(status)}`}>
-            {status.toUpperCase()}
-          </Badge>
-        </div>
-        <div className="flex items-center text-xs text-muted-foreground font-medium uppercase tracking-wider">
-          {dataFormatada} {horaFormatada && `- ${horaFormatada}`}
+        {/* <div className="flex items-center gap-2.5 "> */}
+        <span className="font-bold text-sm tracking-tight text-foreground">
+          #{ordemDeTransporte}
+        </span>
+        <Badge
+          variant="outline"
+          className={`font-medium text-xs border ${getStatusBadgeVariant(status)}`}
+        >
+          {status.toUpperCase()}
+        </Badge>
+        {/* </div> */}
+        <div className="flex items-center text-xs text-muted-foreground font-medium tracking-wider">
+          {dataFormatada.slice(0, 3) +
+            " " +
+            dataFormatada.split("")[4].toUpperCase() +
+            dataFormatada.slice(5, 7) +
+            dataFormatada.slice(7)}{" - "}
+          {horaFormatada && ` ${horaFormatada}`}
         </div>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-4 pt-1">
-
         {/* CARGA E DOCUMENTOS */}
         <div className="flex flex-col gap-1.5 text-sm">
+          <div className="flex items-center gap-2 text-foreground">
+            <UserCircle className="size-4 text-muted-foreground" />
+            <span className="font-semibold">Responsável:</span>
+            <span className="text-muted-foreground text-xs">{responsavel}</span>
+          </div>
           <div className="flex items-center gap-2 text-foreground">
             <Package className="size-4 text-muted-foreground" />
             <span className="font-semibold">{numerocontainer}</span>
@@ -110,7 +125,9 @@ export function CardOrdemTransporte({
           </div>
           <div className="flex items-center gap-2 text-foreground">
             <Truck className="size-4 text-muted-foreground" />
-            <span className="font-semibold uppercase tracking-wide">{placa}</span>
+            <span className="font-semibold uppercase tracking-wide">
+              {placa}
+            </span>
             <span className="text-muted-foreground text-xs">({caminhao})</span>
           </div>
         </div>
@@ -119,7 +136,10 @@ export function CardOrdemTransporte({
         <div className="flex items-center justify-between text-sm mt-1 px-1">
           <div className="flex flex-col items-center gap-1 w-2/5 text-center">
             <MapPin className="size-4 text-muted-foreground" />
-            <span className="font-medium text-foreground line-clamp-1 text-xs" title={partida}>
+            <span
+              className="font-medium text-foreground line-clamp-1 text-xs"
+              title={partida}
+            >
               {partida}
             </span>
           </div>
@@ -131,12 +151,14 @@ export function CardOrdemTransporte({
 
           <div className="flex flex-col items-center gap-1 w-2/5 text-center">
             <MapPin className="size-4 text-primary" />
-            <span className="font-medium text-foreground line-clamp-1 text-xs" title={destino}>
+            <span
+              className="font-medium text-foreground line-clamp-1 text-xs"
+              title={destino}
+            >
               {destino}
             </span>
           </div>
         </div>
-
       </CardContent>
 
       <Separator />
@@ -147,9 +169,21 @@ export function CardOrdemTransporte({
           <Clock className="size-3.5" />
           <span>Atualizado há 15 min</span>
         </div>
-        <VisualizarOrdemDeTransporte caminhao={caminhao} container={container} destino={destino} emissao={emissao} motorista={motorista} notaFiscal={notaFiscal} numerocontainer={numerocontainer} ordemDeTransporte={ordemDeTransporte} partida={partida} placa={placa} status={status} />
+        <VisualizarOrdemDeTransporte
+          responsavel={responsavel}
+          caminhao={caminhao}
+          container={container}
+          destino={destino}
+          emissao={emissao}
+          motorista={motorista}
+          notaFiscal={notaFiscal}
+          numerocontainer={numerocontainer}
+          ordemDeTransporte={ordemDeTransporte}
+          partida={partida}
+          placa={placa}
+          status={status}
+        />
       </CardFooter>
-
     </Card>
   );
 }
