@@ -7,6 +7,7 @@ import {
   Box,
   ChevronRight,
   UserCircle,
+  Timer,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -21,12 +22,14 @@ import {
 } from "../ui/dialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { calcularTempo } from "#/function/CalcularTempo";
 
 export interface CardOtProps {
   responsavel: string;
   ordemDeTransporte: string;
   status: string;
-  emissao: string;
+  createdAt: string;
+  updatedAt: string;
   numerocontainer: string;
   container: string;
   notaFiscal: string;
@@ -41,7 +44,8 @@ export function VisualizarOrdemDeTransporte({
   responsavel,
   ordemDeTransporte,
   status,
-  emissao,
+  createdAt,
+  updatedAt,
   numerocontainer,
   container,
   notaFiscal,
@@ -81,10 +85,10 @@ export function VisualizarOrdemDeTransporte({
     return "bg-secondary text-secondary-foreground";
   };
 
-  const dataFormatada = format(new Date(emissao.split(" ")[0]), "dd, MMM/yy", {
+  const dataFormatada = format(new Date(createdAt.split(" ")[0]), "dd, MMM/yy", {
     locale: ptBR,
   });
-  const horaFormatada = emissao.split(" ")[1]?.split(".")[0].slice(0, 5) || "";
+  const horaFormatada = createdAt.split("-")[2].slice(3,11) || "";
 
   return (
     <Dialog>
@@ -112,7 +116,8 @@ export function VisualizarOrdemDeTransporte({
                 <DialogTitle className="text-xl font-bold">
                   Ordem de Transporte: {ordemDeTransporte}
                 </DialogTitle>
-                <DialogDescription className="flex items-center gap-2 mt-0.5 text-xs">
+                <DialogDescription className="flex flex-col items-start gap-2 mt-0.5 text-xs">
+                  <div className="flex gap-2 items-start">
                   <Calendar className="size-3.5" /> Emitido em:{" "}
                   {dataFormatada.slice(0, 3) +
                     " " +
@@ -120,6 +125,8 @@ export function VisualizarOrdemDeTransporte({
                     dataFormatada.slice(5, 7) +
                     dataFormatada.slice(7)}{" "}
                   - {horaFormatada}
+                  </div>
+                  <div className="flex gap-2 items-start"><Timer className="size-3.5" /> Atualizado {calcularTempo(updatedAt)} </div>
                 </DialogDescription>
               </div>
             </div>

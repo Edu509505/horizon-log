@@ -19,12 +19,14 @@ import {
   UserCircle,
 } from "lucide-react";
 import { VisualizarOrdemDeTransporte } from "../dialog/visualizarOrdemDeTransporte";
+import { calcularTempo } from "#/function/CalcularTempo";
 
 interface CardOtProps {
   responsavel: string;
   ordemDeTransporte: string;
   status: string;
-  emissao: string;
+  createdAt: string;
+  updatedAt: string;
   numerocontainer: string;
   container: string;
   notaFiscal: string;
@@ -39,7 +41,8 @@ export function CardOrdemTransporte({
   responsavel,
   ordemDeTransporte,
   status,
-  emissao,
+  createdAt,
+  updatedAt,
   numerocontainer,
   container,
   notaFiscal,
@@ -67,10 +70,15 @@ export function CardOrdemTransporte({
     return "bg-secondary text-secondary-foreground";
   };
 
-  const dataFormatada = format(new Date(emissao.split(" ")[0]), "dd, MMM/yy", {
-    locale: ptBR,
-  });
-  const horaFormatada = emissao.split(" ")[1]?.split(".")[0].slice(0, 5) || "";
+  const dataFormatada = format(
+    new Date(createdAt.split(" ")[0]),
+    "dd, MMM/yy",
+    {
+      locale: ptBR,
+    },
+  );
+  const horaFormatada =
+    createdAt.split(" ")[1]?.split(".")[0].slice(0, 5) || "";
 
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-all duration-200 border-border bg-card text-card-foreground">
@@ -92,7 +100,8 @@ export function CardOrdemTransporte({
             " " +
             dataFormatada.split("")[4].toUpperCase() +
             dataFormatada.slice(5, 7) +
-            dataFormatada.slice(7)}{" - "}
+            dataFormatada.slice(7)}
+          {" - "}
           {horaFormatada && ` ${horaFormatada}`}
         </div>
       </CardHeader>
@@ -167,14 +176,15 @@ export function CardOrdemTransporte({
       <CardFooter className="flex items-center justify-between py-2.5 bg-muted/20 rounded-b-lg">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="size-3.5" />
-          <span>Atualizado há 15 min</span>
+          <span>Atualizado {calcularTempo(updatedAt)}</span>
         </div>
         <VisualizarOrdemDeTransporte
           responsavel={responsavel}
           caminhao={caminhao}
           container={container}
           destino={destino}
-          emissao={emissao}
+          createdAt={createdAt}
+          updatedAt={updatedAt}
           motorista={motorista}
           notaFiscal={notaFiscal}
           numerocontainer={numerocontainer}
