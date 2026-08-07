@@ -4,7 +4,6 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -73,7 +72,7 @@ export function CardOrdemTransporte({
           #{ordemDeTransporte}
         </span>
         <BadgeStatus estado={status as string} />
-        
+
         {/* </div> */}
         <div className="flex items-center text-xs text-muted-foreground font-medium tracking-wider">
           {dataFormatada.slice(0, 3) +
