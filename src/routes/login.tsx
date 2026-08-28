@@ -1,10 +1,12 @@
 import { LoginForm } from "#/components/login-form";
 import { createFileRoute } from "@tanstack/react-router";
 import image from "../assets/pexels-maltelu-1606957.jpg";
+const url = import.meta.env.VITE_API_URL;
 
 export const Route = createFileRoute("/login")({ component: Login });
 
 export default function Login() {
+  console.log("ESTOU AQUI: ", url)
   return (
     <>
       <img
