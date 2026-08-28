@@ -1,4 +1,3 @@
-import { Cadastro } from "#/components/forms/createAccount/formAccount";
 import {
   Card,
   CardContent,
@@ -15,20 +14,21 @@ export const Route = createFileRoute("/create-account/")({
 
 function RouteComponent() {
   return (
-    <div className="h-screen p-5 bg-background flex justify-center items-center">
-      <Card className="w-full max-w-xl flex-row">
-        <CardHeader className="w-1/2">
+    <div className="min-h-screen p-4 sm:p-5 bg-background flex justify-center items-center">
+      <Card className="w-full max-w-sm md:max-w-xl flex flex-col md:flex-row items-center justify-center">
+        <CardHeader className="w-full md:w-1/2">
           <div className="flex flex-col items-center justify-center h-full gap-2">
-            <img src={Logo} alt="" className="size-24" />
-            <CardContent className="text-center">
+            <img src={Logo} alt="Logo" className="size-20 md:size-24" />
+            <CardContent className="text-center p-0 font-semibold text-lg">
               Seja muito Bem-vindo
             </CardContent>
             <CardDescription className="text-center">
-              Para comerçarmos, você vai precisa digitar suas informações
+              Para começarmos, você vai precisar digitar suas informações
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="w-1/2">
+
+        <CardContent className="w-full md:w-1/2 pt-0 md:pt-6">
           <PreCadastro />
         </CardContent>
       </Card>
