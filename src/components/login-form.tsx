@@ -17,6 +17,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { cn } from "#/lib/utils";
 import logo from "../assets/logo.svg";
+const url = import.meta.env.VITE_API_URL;
 
 // 1. Defina o esquema de validação
 const loginSchema = z.object({
@@ -43,7 +44,7 @@ export function LoginForm({
 
   const handleLogin = async (data: LoginData) => {
     try {
-      const response = await api.post("/auth/login", data);
+      const response = await api.post(`${url}/auth/login`, data);
       const { acces_token, user } = response.data;
 
       setAuth(acces_token, user);

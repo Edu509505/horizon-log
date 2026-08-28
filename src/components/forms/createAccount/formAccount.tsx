@@ -33,6 +33,8 @@ import { toast } from "sonner";
 import { useAuth, usePreRegister } from "states/userAuth";
 import { api } from "#/lib/api";
 
+const url = import.meta.env.VITE_API_URL;
+
 const createAccountSchema = z.object({
   name: z.string().min(5, "Digite seu nome"),
   email: z.email({ error: "Insira um E-mail válido" }),
@@ -70,12 +72,14 @@ export function Cadastro() {
     },
   });
 
+  // console.log("Formulário",form.watch())
+
   const [isOpen, setIsOpen] = useState<boolean | undefined>(false);
 
   const createAccount = useMutation({
     mutationKey: ["createaccount"],
     mutationFn: async (data: z.infer<typeof createAccountSchema>) => {
-      const response = await fetch(`http://localhost:3333/users`, {
+      const response = await fetch(`${url}/users`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -99,6 +103,8 @@ export function Cadastro() {
     try {
       await createAccount.mutateAsync(data);
 
+      console.log("onSubmit",createAccount)
+
       const loginResponse = await api.post("/auth/login", {
         email: data.email,
         password: data.password,
@@ -112,6 +118,7 @@ export function Cadastro() {
 
       setIsOpen(true);
     } catch (error) {
+      console.log("onSubmit",error)
       setIsOpen(true);
     }
   }
@@ -235,7 +242,7 @@ export function Cadastro() {
                     Não foi possivel completar essa ação
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    A acção não pode ser concluída, tente novamente mais tarde
+                    A ação não pode ser concluída, tente novamente mais tarde
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

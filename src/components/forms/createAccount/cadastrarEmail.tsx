@@ -25,7 +25,9 @@ import {
 } from "#/components/ui/alert-dialog";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAuth, usePreRegister } from "states/userAuth";
+import { usePreRegister } from "states/userAuth";
+
+const url = import.meta.env.VITE_API_URL;
 
 const createAccountSchema = z.object({
   email: z.email({ error: "Insira um E-mail válido" }),
@@ -44,7 +46,7 @@ export function PreCadastro() {
   const createAccount = useMutation({
     mutationKey: ["preregitro"],
     mutationFn: async (data: z.infer<typeof createAccountSchema>) => {
-      const response = await fetch(`http://localhost:3333/pre_registration`, {
+      const response = await fetch(`${url}/pre_registration`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -64,7 +66,7 @@ export function PreCadastro() {
 
   const enviarOTP = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`http://localhost:3333/verify`, {
+      const response = await fetch(`${url}/verify`, {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({

@@ -10,12 +10,13 @@ import { Controller, useForm } from "react-hook-form";
 import { isCNPJ } from "brazilian-values";
 import { Button } from "../../ui/button";
 // import { formCreateAccount } from "../../../../states/createAccount";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Input } from "#/components/ui/input";
 import { InputCnpj } from "#/components/inputAutoCurrent/InputCnpj";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "states/userAuth";
 import { toast } from "sonner";
+const url = import.meta.env.VITE_API_URL;
 
 const createEmpresaSchema = z.object({
   user_id: z.string(),
@@ -55,7 +56,7 @@ export function CadastroMaisInformacoes() {
   const createAccount = useMutation({
     mutationKey: ["createaccount"],
     mutationFn: async (data: z.infer<typeof createEmpresaSchema>) => {
-      const response = await fetch(`http://localhost:3333/empresa`, {
+      const response = await fetch(`${url}/empresa`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",

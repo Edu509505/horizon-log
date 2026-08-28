@@ -1,5 +1,4 @@
 import { RefreshCwIcon } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,6 +20,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { usePreRegister } from "states/userAuth";
+const url = import.meta.env.VITE_API_URL;
 
 interface inputOTPFormProps {
   user_id: string;
@@ -47,7 +47,7 @@ export function InputOTPForm({
   console.log("pre registro recebido: ", pre_registration_id);
   const reenviarOTP = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`http://localhost:3333/verify`, {
+      const response = await fetch(`${url}/verify`, {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({ user_id, pre_registration_id, type }),
@@ -60,7 +60,7 @@ export function InputOTPForm({
 
   const enviarConfirmacao = useMutation({
     mutationFn: async (inputOtp: string) => {
-      const response = await fetch(`http://localhost:3333/verify/check`, {
+      const response = await fetch(`${url}/verify/check`, {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({
