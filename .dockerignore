@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.git
+.gitignore
+.DS_Store
+*.local
+.tanstack
+.vscode
+README.md
