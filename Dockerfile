@@ -3,16 +3,22 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Instala dependências primeiro (usa cache do Docker se o package.json não mudou)
 COPY package*.json ./
 RUN npm ci
 
 COPY . .
 
-# Recebe e injeta a variável APENAS na hora de buildar o app
-ARG VITE_API_URL=https://api-horizonlog-50e567-horizon-log.guaracloud.com
+# 1. Declara e exporta a variável de ambiente
+ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
+# 2. O ECHO ENTRA AQUI!
+RUN echo "=========================================" && \
+    echo "CHECKPOINT DOCKER BUILD:" && \
+    echo "A variavel VITE_API_URL eh: '$VITE_API_URL'" && \
+    echo "========================================="
+
+# 3. Executa a compilação do Vite
 RUN npm run build
 
 # Stage 2: Serve with Nginx
