@@ -10,7 +10,7 @@ RUN npm ci
 COPY . .
 
 # Recebe e injeta a variável APENAS na hora de buildar o app
-ARG VITE_API_URL=https://www.horizonlog.com.br
+ARG VITE_API_URL=https://api-horizonlog-50e567-horizon-log.guaracloud.com
 ENV VITE_API_URL=$VITE_API_URL
 
 RUN npm run build
