@@ -18,9 +18,10 @@ export default defineConfig(({ mode }) => {
       viteReact(),
     ],
     define: {
-      // Garante a substituição no código compilado mesmo no ambiente Alpine/Linux
+      // process.env tem prioridade (variável injetada pelo Docker ENV/ARG em CI/CD)
+      // env (loadEnv) serve como fallback para desenvolvimento local via arquivo .env
       "import.meta.env.VITE_API_URL": JSON.stringify(
-        env.VITE_API_URL || process.env.VITE_API_URL
+        process.env.VITE_API_URL || env.VITE_API_URL
       ),
     },
   };
