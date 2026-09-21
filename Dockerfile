@@ -13,7 +13,7 @@ ARG VITE_API_URL=https://horizonlogbackend-production.apps.upuai.cloud
 ENV VITE_API_URL=$VITE_API_URL
 
 RUN echo "=========================================" && \
-    echo "DIACHO!!!: '$VITE_API_URL'" && \
+    echo "Variável: '$VITE_API_URL'" && \
     echo "========================================="
 
 RUN npm run build
@@ -21,13 +21,16 @@ RUN npm run build
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
 
-# FIX: Define um WORKDIR válido para a plataforma Upuai não chiar
+# WORKDIR exigido pela plataforma Upuai
 WORKDIR /usr/share/nginx/html
 
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Remove a config padrão
+RUN rm /etc/nginx/conf.d/default.conf 2>/dev/null || true
 
-# Copia da pasta dist do builder para o WORKDIR atual (.)
+# Copia sua configuração customizada do Nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copia os arquivos gerados do build (dist) para a pasta atual (.)
 COPY --from=builder /app/dist .
 
 EXPOSE 80
