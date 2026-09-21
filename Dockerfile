@@ -9,7 +9,7 @@ RUN npm ci
 COPY . .
 
 # 1. Declara e exporta a variável de ambiente
-ARG VITE_API_URL=https://api-horizonlog-50e567-horizon-log.guaracloud.com
+ARG VITE_API_URL=https://horizonlogbackend-production.apps.upuai.cloud
 ENV VITE_API_URL=$VITE_API_URL
 
 # 2. O ECHO ENTRA AQUI!
