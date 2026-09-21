@@ -8,23 +8,27 @@ RUN npm ci
 
 COPY . .
 
-# 1. Declara e exporta a variável de ambiente
+# Declara e exporta a variável de ambiente
 ARG VITE_API_URL=https://horizonlogbackend-production.apps.upuai.cloud
 ENV VITE_API_URL=$VITE_API_URL
 
-# 2. O ECHO ENTRA AQUI!
 RUN echo "=========================================" && \
     echo "DIACHO!!!: '$VITE_API_URL'" && \
     echo "========================================="
 
-# 3. Executa a compilação do Vite
 RUN npm run build
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
+
+# FIX: Define um WORKDIR válido para a plataforma Upuai não chiar
+WORKDIR /usr/share/nginx/html
+
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/dist /app/dist
+
+# Copia da pasta dist do builder para o WORKDIR atual (.)
+COPY --from=builder /app/dist .
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
