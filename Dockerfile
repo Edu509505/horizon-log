@@ -10,6 +10,7 @@ RUN npm run build
 
 # Use Nginx para servir arquivos estáticos (para apps front-end)
 FROM nginxinc/nginx-unprivileged:alpine3.22 AS runner
+WORKDIR /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 USER nginx
